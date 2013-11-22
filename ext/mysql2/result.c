@@ -267,53 +267,17 @@ static VALUE rb_mysql_result_fetch_row(VALUE self, ID db_timezone, ID app_timezo
           }
           break;
         }
-        case MYSQL_TYPE_TIMESTAMP: { // TIMESTAMP field
-          unsigned int year, month, day, hour, min, sec, tokens;
-          uint64_t seconds;
-
-          tokens = sscanf(row[i], "%4d%2d%2d%2d%2d%2d", &year, &month, &day, &hour, &min, &sec);
-          seconds = (year*31557600ULL) + (month*2592000ULL) + (day*86400ULL) + (hour*3600ULL) + (min*60ULL) + sec;
-
-          if (seconds == 0) {
-            val = Qnil;
-          } else {
-            if (month < 1 || day < 1) {
-              rb_raise(cMysql2Error, "Invalid date: %s", row[i]);
-              val = Qnil;
-            } else {
-              if (seconds < MYSQL2_MIN_TIME || seconds > MYSQL2_MAX_TIME) { // use DateTime instead
-                VALUE offset = INT2NUM(0);
-                if (db_timezone == intern_local) {
-                  offset = rb_funcall(cMysql2Client, intern_local_offset, 0);
-                }
-                val = rb_funcall(cDateTime, intern_civil, 7, INT2NUM(year), INT2NUM(month), INT2NUM(day), INT2NUM(hour), INT2NUM(min), INT2NUM(sec), offset);
-                if (!NIL_P(app_timezone)) {
-                  if (app_timezone == intern_local) {
-                    offset = rb_funcall(cMysql2Client, intern_local_offset, 0);
-                    val = rb_funcall(val, intern_new_offset, 1, offset);
-                  } else { // utc
-                    val = rb_funcall(val, intern_new_offset, 1, opt_utc_offset);
-                  }
-                }
-              } else {
-                val = rb_funcall(rb_cTime, db_timezone, 6, INT2NUM(year), INT2NUM(month), INT2NUM(day), INT2NUM(hour), INT2NUM(min), INT2NUM(sec));
-                if (!NIL_P(app_timezone)) {
-                  if (app_timezone == intern_local) {
-                    val = rb_funcall(val, intern_localtime, 0);
-                  } else { // utc
-                    val = rb_funcall(val, intern_utc, 0);
-                  }
-                }
-              }
-            }
-          }
-          break;
-        }
+        case MYSQL_TYPE_TIMESTAMP: 
         case MYSQL_TYPE_DATETIME: { // DATETIME field
           unsigned int year, month, day, hour, min, sec, tokens;
           uint64_t seconds;
 
-          tokens = sscanf(row[i], "%4d-%2d-%2d %2d:%2d:%2d", &year, &month, &day, &hour, &min, &sec);
+          char *format = "%4d-%2d-%2d %2d:%2d:%2d";
+          if (type == MYSQL_TYPE_TIMESTAMP) {
+              format = "%4d%2d%2d%2d%2d%2d";
+          }
+          tokens = sscanf(row[i], format, &year, &month, &day, &hour, &min, &sec);
+          
           seconds = (year*31557600ULL) + (month*2592000ULL) + (day*86400ULL) + (hour*3600ULL) + (min*60ULL) + sec;
 
           if (seconds == 0) {
