@@ -267,7 +267,7 @@ static VALUE rb_mysql_result_fetch_row(VALUE self, ID db_timezone, ID app_timezo
           }
           break;
         }
-        case MYSQL_TYPE_TIMESTAMP:  // TIMESTAMP field
+        case MYSQL_TYPE_TIMESTAMP: { // TIMESTAMP field
           unsigned int year, month, day, hour, min, sec, tokens;
           uint64_t seconds;
 
