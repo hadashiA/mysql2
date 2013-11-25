@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe Mysql2::Result do
   before(:each) do
-    @client = Mysql2::Client.new :host => "localhost", :username => "root", :database => 'test'
+    @client = Mysql2::Client.new :host => "127.0.0.1", :username => "root", :database => 'test', :port => 13306
   end
 
   before(:each) do
@@ -230,7 +230,7 @@ describe Mysql2::Result do
 
     it "should return Time for a TIMESTAMP value when within the supported range" do
       @test_result['timestamp_test'].class.should eql(Time)
-      @test_result['timestamp_test'].strftime("%Y-%m-%d %H:%M:%S").should eql('2010-04-04 11:44:00')
+      @test_result['timestamp_test'].strftime("%Y-%m-%d %H:%M:%S").should eql('2012-11-22 13:29:19')
     end
 
     it "should return Time for a TIME value" do

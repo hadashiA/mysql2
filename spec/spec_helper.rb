@@ -6,7 +6,7 @@ require 'timeout'
 
 RSpec.configure do |config|
   config.before(:all) do
-    client = Mysql2::Client.new :host => "localhost", :username => "root", :database => 'test'
+    client = Mysql2::Client.new :host => "127.0.0.1", :username => "root", :database => 'test', :port => 13306
     client.query %[
       CREATE TABLE IF NOT EXISTS mysql2_test (
         id MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -56,8 +56,8 @@ RSpec.configure do |config|
       )
 
       VALUES (
-        NULL, b'101', 1, 1, 10, 10, 10, 10,
-        10.3, 0, 10.3, 10.3, 0, '2010-4-4', '2010-4-4 11:44:00', '2010-4-4 11:44:00', '11:44:00',
+        NULL, 101, 1, 1, 10, 10, 10, 10,
+        10.3, 0, 10.3, 10.3, 0, '2010-4-4', '2010-4-4 11:44:00', '2012-11-22 13:29:19', '11:44:00',
         2009, "test", "test", "test", "test", "test",
         "test", "test", "test", "test", "test",
         "test", "test", 'val1', 'val1,val2'
